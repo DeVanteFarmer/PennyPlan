@@ -1,0 +1,6 @@
+@PennyPlan_HostAddress = http://localhost:5169
+
+GET {{PennyPlan_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
