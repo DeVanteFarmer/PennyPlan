@@ -1,4 +1,6 @@
 
+using PennyPlan.Repositories;
+
 namespace PennyPlan
 {
     public class Program
@@ -11,6 +13,7 @@ namespace PennyPlan
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddTransient<IUserRepository, UserRepository>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
