@@ -1,4 +1,4 @@
-
+using Microsoft.AspNetCore.Authentication.Cookies;
 using PennyPlan.Repositories;
 
 namespace PennyPlan
@@ -9,17 +9,29 @@ namespace PennyPlan
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
+            // Add services to the container
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Add custom repositories
             builder.Services.AddTransient<IUserRepository, UserRepository>();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddTransient<IBillRepository, BillRepository>();
+            builder.Services.AddTransient<ITransactionsRepository, TransactionsRepository>();
+            builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
+
+            // Configure cookie-based authentication without Entity Framework
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/account/login"; // Specify login path
+                    options.LogoutPath = "/account/logout"; // Specify logout path
+                });
+
+            // Add Authorization service
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -28,8 +40,9 @@ namespace PennyPlan
 
             app.UseHttpsRedirection();
 
+            // Enable Authentication and Authorization
+            app.UseAuthentication(); // Enable cookie authentication
             app.UseAuthorization();
-
 
             app.MapControllers();
 
@@ -37,3 +50,5 @@ namespace PennyPlan
         }
     }
 }
+
+

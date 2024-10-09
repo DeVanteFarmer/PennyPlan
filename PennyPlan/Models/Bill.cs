@@ -29,5 +29,9 @@ namespace PennyPlan.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+        public Category? Category { get; set; }
+
+        public User User { get; set; }
     }
 }

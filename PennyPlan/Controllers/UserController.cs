@@ -15,9 +15,9 @@ namespace PennyPlan.Controllers
         }
 
         [HttpGet("GetByEmail")]
-        public IActionResult GetByEmail(string email)
+        public IActionResult GetByEmail(string email, string password)
         {
-            var user = _userRepository.GetByEmail(email);
+            var user = _userRepository.GetByEmail(email, password);
 
             if (email == null || user == null)
             {
