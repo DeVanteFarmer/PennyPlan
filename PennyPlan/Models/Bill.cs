@@ -11,7 +11,7 @@ namespace PennyPlan.Models
 
         [Required]
         [MaxLength(255)]
-        public string BillName { get; set; }
+        public string BillName { get; set; } // Acts as the category (e.g., Rent, Utilities, etc.)
 
         [Required]
         public int Amount { get; set; }
@@ -21,16 +21,11 @@ namespace PennyPlan.Models
         public DateTime DueDate { get; set; }
 
         [Required]
-        public int CategoryId { get; set; }
-
-        [Required]
         public bool Paid { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
-
-        public Category? Category { get; set; }
 
         public User User { get; set; }
     }

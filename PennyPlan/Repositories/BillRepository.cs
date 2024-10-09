@@ -21,13 +21,11 @@ namespace PennyPlan.Repositories
                 {
                     cmd.CommandText = @"
                         SELECT b.Id, b.UserId, b.BillName, b.Amount, b.DueDate, 
-                               b.CategoryId, b.Paid, b.CreatedAt, b.UpdatedAt, 
-                               c.Name AS CategoryName, 
+                               b.Paid, b.CreatedAt, b.UpdatedAt,  
                                u.[Id] AS UserId, u.UserName, u.Email, u.CreatedAt AS UserCreatedAt,
                                u.UpdatedAt AS UserUpdatedAt, u.PasswordHash
                         FROM Bill b
                              LEFT JOIN [User] u ON b.UserId = u.Id
-                             LEFT JOIN Category c ON b.CategoryId = c.Id
                         ORDER BY b.Paid DESC";
 
                     var reader = cmd.ExecuteReader();
@@ -43,7 +41,7 @@ namespace PennyPlan.Repositories
             }
         }
 
-        public List<Bill> GetBillsByCategory(int categoryId)
+        public List<Bill> GetBillsByName(string billName)
         {
             using (var conn = Connection)
             {
@@ -52,13 +50,11 @@ namespace PennyPlan.Repositories
                 {
                     cmd.CommandText = @"
                         SELECT b.Id, b.UserId, b.BillName, b.Amount, b.DueDate, 
-                               b.CategoryId, b.Paid, b.CreatedAt, b.UpdatedAt, 
-                               c.Name AS CategoryName 
+                               b.Paid, b.CreatedAt, b.UpdatedAt,  
                         FROM Bill b
-                        JOIN Category c ON b.CategoryId = c.Id
-                        WHERE b.CategoryId = @categoryId";
+                        ORDER BY b.BillName ASC";
 
-                    cmd.Parameters.AddWithValue("category", categoryId);
+                    cmd.Parameters.AddWithValue("billName", billName);
 
                     var reader = cmd.ExecuteReader();
                     var bills = new List<Bill>();
@@ -75,12 +71,6 @@ namespace PennyPlan.Repositories
                             CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
                             UpdatedAt = reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
                             Paid = reader.GetBoolean(reader.GetOrdinal("Paid")),
-                            CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
-                            Category = new Category()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("CategoryId")),
-                                Name = reader.GetString(reader.GetOrdinal("CategoryName"))
-                            }
                         });
                     }
 
@@ -91,6 +81,7 @@ namespace PennyPlan.Repositories
         }
 
         // CRUD Methods Below //
+        // Add a new bill
         public void AddBill(Bill bill)
         {
             using (var conn = Connection)
@@ -98,16 +89,15 @@ namespace PennyPlan.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Bill (UserId, BillName, Amount, DueDate, 
-                               CategoryId, Paid, CreatedAt, UpdatedAt)
-                                        OUTPUT INSERTED.ID
-                                        VALUES  (@UserId, @BillName, @Amount, @DueDate,
-                               @CategoryId, @Paid, @CreatedAt, @UpdatedAt)";
+                    cmd.CommandText = @"
+                INSERT INTO Bills (UserId, BillName, Amount, DueDate, Paid, CreatedAt, UpdatedAt)
+                OUTPUT INSERTED.ID
+                VALUES (@UserId, @BillName, @Amount, @DueDate, @Paid, @CreatedAt, @UpdatedAt)";
+
                     DbUtils.AddParameter(cmd, "@UserId", bill.UserId);
-                    DbUtils.AddParameter(cmd, "@BillName", bill.BillName);
+                    DbUtils.AddParameter(cmd, "@BillName", bill.BillName); // BillName acts as category
                     DbUtils.AddParameter(cmd, "@Amount", bill.Amount);
                     DbUtils.AddParameter(cmd, "@DueDate", bill.DueDate);
-                    DbUtils.AddParameter(cmd, "@CategoryId", bill.CategoryId);
                     DbUtils.AddParameter(cmd, "@Paid", bill.Paid);
                     DbUtils.AddParameter(cmd, "@CreatedAt", bill.CreatedAt);
                     DbUtils.AddParameter(cmd, "@UpdatedAt", bill.UpdatedAt);
@@ -117,6 +107,7 @@ namespace PennyPlan.Repositories
             }
         }
 
+        // Update an existing bill
         public void Update(Bill bill)
         {
             using (var conn = Connection)
@@ -125,23 +116,27 @@ namespace PennyPlan.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        UPDATE Bill 
-                           SET BillName = @BillName,
-                               Amount = @Amount,
-                               DueDate = @DueDate,
-                               Paid = @Paid,
-                               UpdatedAt = @UpdatedAt
-                         WHERE Id = @Id";
+                UPDATE Bills
+                SET BillName = @BillName, 
+                    Amount = @Amount, 
+                    DueDate = @DueDate, 
+                    Paid = @Paid,
+                    UpdatedAt = @UpdatedAt
+                WHERE Id = @Id AND UserId = @UserId";
 
-                    DbUtils.AddParameter(cmd, "@BillName", bill.BillName);
+                    DbUtils.AddParameter(cmd, "@BillName", bill.BillName); // BillName acts as category
                     DbUtils.AddParameter(cmd, "@Amount", bill.Amount);
                     DbUtils.AddParameter(cmd, "@DueDate", bill.DueDate);
                     DbUtils.AddParameter(cmd, "@Paid", bill.Paid);
-                    DbUtils.AddParameter(cmd, "@UpdatedAt", bill.UpdatedAt);
+                    DbUtils.AddParameter(cmd, "@UpdatedAt", DateTime.Now);
+                    DbUtils.AddParameter(cmd, "@Id", bill.Id);
+                    DbUtils.AddParameter(cmd, "@UserId", bill.UserId);
+
                     cmd.ExecuteNonQuery();
                 }
             }
         }
+
 
         public void Delete(int id)
         {
@@ -171,12 +166,6 @@ namespace PennyPlan.Repositories
                 CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
                 UpdatedAt = reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
                 Paid = reader.GetBoolean(reader.GetOrdinal("Paid")),
-                CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
-                Category = new Category()
-                {
-                    Id = reader.GetInt32(reader.GetOrdinal("CategoryId")),
-                    Name = reader.GetString(reader.GetOrdinal("CategoryName"))
-                },
                 User = new User()
                 {
                     Id = DbUtils.GetInt(reader, "UserId"),
