@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS [Users];
 GO
 
 -- Create Users table
+-- Create Users table
 CREATE TABLE [Users] (
     [id] INT PRIMARY KEY IDENTITY,
     [userName] NVARCHAR(255) NOT NULL,
@@ -27,11 +28,23 @@ CREATE TABLE [Users] (
 );
 GO
 
--- Create Categories table
+-- Create Category table
 CREATE TABLE [Categories] (
     [id] INT PRIMARY KEY IDENTITY,
     [name] NVARCHAR(255) NOT NULL,
-    [description] NVARCHAR(255)
+    [isBillCategory] BIT NOT NULL DEFAULT 0, -- 0 = False, 1 = True
+    [isTransactionCategory] BIT NOT NULL DEFAULT 0 -- 0 = False, 1 = True
+);
+GO
+
+-- Create Savings table
+CREATE TABLE [Savings] (
+    [id] INT PRIMARY KEY IDENTITY,
+    [userId] INT NOT NULL,
+    [savings_amount] INT NOT NULL,
+    [created_at] DATETIME NOT NULL DEFAULT GETDATE(),
+    [updated_at] DATETIME2 NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT [FK_Savings_Users] FOREIGN KEY ([userId]) REFERENCES [Users] ([id])
 );
 GO
 
@@ -55,8 +68,8 @@ CREATE TABLE [Bills] (
     [bill_name] NVARCHAR(255) NOT NULL,
     [amount] INT NOT NULL,
     [due_date] DATE NOT NULL,
-    [categoryId] INT NOT NULL,
     [paid] BIT NOT NULL,
+    [categoryId] INT NOT NULL,
     [created_at] DATETIME NOT NULL DEFAULT GETDATE(),
     [updated_at] DATETIME2 NOT NULL DEFAULT GETDATE(),
     CONSTRAINT [FK_Bills_Users] FOREIGN KEY ([userId]) REFERENCES [Users] ([id]),
@@ -70,8 +83,8 @@ CREATE TABLE [Transactions] (
     [userId] INT NOT NULL,
     [transaction_name] NVARCHAR(255) NOT NULL,
     [amount] INT NOT NULL,
-    [categoryId] INT NOT NULL,
     [date] DATE NOT NULL,
+    [categoryId] INT NOT NULL,
     [created_at] DATETIME NOT NULL DEFAULT GETDATE(),
     CONSTRAINT [FK_Transactions_Users] FOREIGN KEY ([userId]) REFERENCES [Users] ([id]),
     CONSTRAINT [FK_Transactions_Categories] FOREIGN KEY ([categoryId]) REFERENCES [Categories] ([id])
