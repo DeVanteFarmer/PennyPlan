@@ -17,13 +17,13 @@ namespace PennyPlan.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                         SELECT t.Id, t.UserId, t.TransactionName, t.Amount, t.CategoryId, t.Date, t.CreatedAt, 
-                                u.Id AS UserId, u.UserName, u.Email, c.Name AS CategoryName
-                         FROM Transactions t
-                         LEFT JOIN Category c ON t.CategoryId = c.Id
-                         LEFT JOIN [User] u ON t.UserId = u.Id
-                         WHERE t.UserId = @userId
-                         ORDER BY t.CreatedAt DESC";
+                SELECT t.Id, t.UserId, t.TransactionName, t.Amount, t.CategoryId, t.Date, t.CreatedAt, 
+                       u.Id AS UserId, u.UserName, u.Email, c.Name AS CategoryName
+                FROM Transactions t
+                     LEFT JOIN Categories c ON t.CategoryId = c.Id
+                     LEFT JOIN [Users] u ON t.UserId = u.Id
+                WHERE t.UserId = @userId
+                ORDER BY t.CreatedAt DESC";
 
                     cmd.Parameters.AddWithValue("@userId", userId);
 
@@ -41,6 +41,17 @@ namespace PennyPlan.Repositories
                             CategoryId = DbUtils.GetInt(reader, "CategoryId"),
                             Date = DbUtils.GetDateTime(reader, "Date"),
                             CreatedAt = DbUtils.GetDateTime(reader, "CreatedAt"),
+                            Category = new Category
+                            {
+                                Id = DbUtils.GetInt(reader, "CategoryId"),
+                                Name = DbUtils.GetString(reader, "CategoryName")
+                            },
+                            User = new User()
+                            {
+                                Id = DbUtils.GetInt(reader, "UserId"),
+                                UserName = DbUtils.GetString(reader, "UserName"),
+                                Email = DbUtils.GetString(reader, "Email")
+                            }
                         };
                         transactions.Add(transaction);
                     }

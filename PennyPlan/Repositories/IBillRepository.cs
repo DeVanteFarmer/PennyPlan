@@ -7,7 +7,7 @@ namespace PennyPlan.Repositories
         void AddBill(Bill bill);
         void Delete(int id);
         List<Bill> GetAllUserBills();
-        List<Bill> GetBillsByCategory(int categoryId);
+        List<Bill> GetBillsByCategoryId(int id);
         void Update(Bill bill);
     }
 }

@@ -21,6 +21,9 @@ namespace PennyPlan.Models
         public DateTime DueDate { get; set; }
 
         [Required]
+        public int CategoryId { get; set; }
+
+        [Required]
         public bool Paid { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
@@ -28,5 +31,7 @@ namespace PennyPlan.Models
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         public User User { get; set; }
+
+        public Category Category { get; set; }
     }
 }

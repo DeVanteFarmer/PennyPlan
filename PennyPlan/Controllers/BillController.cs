@@ -23,9 +23,9 @@ namespace PennyPlan.Controllers
         }
 
         [HttpGet("category/{categoryId}")]
-        public IActionResult GetByCaterogyId(int categoryId)
+        public IActionResult GetByCategoryId(int categoryId)
         {
-            var bills = _billRepository.GetBillsByCategory(categoryId);
+            var bills = _billRepository.GetBillsByCategoryId(categoryId);
             return Ok(bills);
         }
 
