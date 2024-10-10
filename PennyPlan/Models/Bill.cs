@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PennyPlan.Models
 {
@@ -26,8 +27,11 @@ namespace PennyPlan.Models
         [Required]
         public bool Paid { get; set; }
 
+        [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+
+        [Column("updated_at")] // Maps to updated_at column in the database
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         public User User { get; set; }

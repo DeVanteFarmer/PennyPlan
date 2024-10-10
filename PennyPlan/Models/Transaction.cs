@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PennyPlan.Models
 {
@@ -23,6 +24,7 @@ namespace PennyPlan.Models
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
 
+        [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public User User { get; set; }

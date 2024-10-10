@@ -78,16 +78,20 @@ namespace PennyPlan.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        INSERT INTO Category (Name)
-                        OUTPUT INSERTED.ID
-                        VALUES (@Name)
-                                       ";
+                INSERT INTO Category (Name, IsBillCategory, IsTransactionCategory)
+                OUTPUT INSERTED.ID
+                VALUES (@Name, @IsBillCategory, @IsTransactionCategory)";
+
                     DbUtils.AddParameter(cmd, "@Name", category.Name);
+                    DbUtils.AddParameter(cmd, "@IsBillCategory", category.IsBillCategory);
+                    DbUtils.AddParameter(cmd, "@IsTransactionCategory", category.IsTransactionCategory);
 
                     category.Id = (int)cmd.ExecuteScalar();
                 }
             }
         }
+
+
         public void Update(Category category)
         {
             using (var conn = Connection)
@@ -96,17 +100,22 @@ namespace PennyPlan.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        UPDATE Category
-                           SET Name = @Name
-                        WHERE Id = @Id;
-                                       ";
+                UPDATE Category
+                   SET Name = @Name,
+                       IsBillCategory = @IsBillCategory,
+                       IsTransactionCategory = @IsTransactionCategory
+                WHERE Id = @Id";
+
                     DbUtils.AddParameter(cmd, "@Name", category.Name);
+                    DbUtils.AddParameter(cmd, "@IsBillCategory", category.IsBillCategory);
+                    DbUtils.AddParameter(cmd, "@IsTransactionCategory", category.IsTransactionCategory);
                     DbUtils.AddParameter(cmd, "@Id", category.Id);
 
                     cmd.ExecuteNonQuery();
                 }
             }
         }
+
         public void Delete(int id)
         {
             using (var conn = Connection)
@@ -115,7 +124,7 @@ namespace PennyPlan.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = "DELETE FROM Category WHERE Id = @Id";
-                    DbUtils.AddParameter(cmd, "@id", id);
+                    DbUtils.AddParameter(cmd, "@Id", id);
                     cmd.ExecuteNonQuery();
                 }
             }
