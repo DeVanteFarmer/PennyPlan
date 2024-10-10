@@ -1,0 +1,48 @@
+const apiUrl = "https://localhost:5001/api/Transactions";
+
+// Fetch all transactions for a specific user
+export const getUserTransactions = (userObject) => {
+  return fetch(`${apiUrl}/${userObject.id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+  .then((response) => response.json());
+};
+
+
+// Fetch a specific transaction by ID
+export const getTransactionById = (id) => {
+  return fetch(`${apiUrl}/${id}`)
+    .then((response) => response.json());
+};
+
+// Add a new transaction
+export const addTransaction = (transaction) => {
+  return fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(transaction),
+  }).then((response) => response.json());
+};
+
+// Update an existing transaction
+export const updateTransaction = (transaction) => {
+  return fetch(`${apiUrl}/${transaction.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(transaction),
+  });
+};
+
+// Delete a transaction by ID
+export const deleteTransaction = (id) => {
+  return fetch(`${apiUrl}/${id}`, {
+    method: "DELETE",
+  });
+};
